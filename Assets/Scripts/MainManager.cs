@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -22,6 +23,8 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        DisplayHighScore();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -55,9 +58,12 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (m_Points > DataStorage.Instance.highScore)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                DataStorage.Instance.highScore = m_Points;
+                DataStorage.Instance.playerName = DataStorage.Instance.currentName;
+
+                DataStorage.Instance.SaveDataMethod();
             }
         }
     }
@@ -72,5 +78,23 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ToMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    void DisplayHighScore()
+    {
+        if(DataStorage.Instance != null)
+        {
+            highScoreText.text = "Best Score: " + DataStorage.Instance.playerName + " : " + DataStorage.Instance.highScore;
+        }
     }
 }
